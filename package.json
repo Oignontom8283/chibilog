@@ -1,0 +1,23 @@
+{
+  "name": "chibilog",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node tests/main.ts"
+  },
+  "keywords": [],
+  "author": "https://github.com/Oignontom8283",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/node": "^22.13.11",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1"
+  }
+}

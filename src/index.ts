@@ -1,13 +1,14 @@
 import chalk from "chalk";
 import * as path from "path";
 import * as fs from "fs";
-import { StandardsDateFormatter, LogLevel, LogLevelColors, DefaultTagsType, DateFormatter, clearAnsiCode, colorizeTagString, getEnumKey } from "./utils";
+import { StandardsDateFormatter, LogLevel, LogLevelColors, DefaultTagsType, DateFormatter, clearAnsiCode, colorizeTagString, getEnumKey, generateId } from "./utils";
 
 export * from "./utils";
 
 type LoggerSettings = {
     logDir:string;
     minimumLogLevel: LogLevel;
+    customId: string;
     logFile: (time:Date) => string;
     logBuilder:(time:string, level:LogLevel, content:string, tags:string[]) => string;
     dateFormat: DateFormatter;
@@ -18,31 +19,33 @@ type LoggerSettings = {
 
 type ParamsLogFunction = any[];
 
-type Tags = DefaultTagsType | (string & {});
+type Tag = DefaultTagsType | (string & {});
 
 class ChibiLog {
 
     private settings:LoggerSettings
 
-    private defautSettings: LoggerSettings = {
-        logDir: './logs',
-        minimumLogLevel: LogLevel.info,
-        logFile: this.defaultLogFileNameFormater,
-        logBuilder: this.defaultLogTextFormater,
-        logToConsole: true,
-        dateFormat: StandardsDateFormatter.ISO_8601,
-        clearANSIColorInFile: true,
-        clearANSICOlorInConsole: false
-    }
+    public id:string;
 
     constructor(loggerSettings:Partial<LoggerSettings>) {
 
-        const temp = {...this.defautSettings, ...loggerSettings};
+        this.settings = {...{
+            logDir: './logs',
+            minimumLogLevel: LogLevel.info,
+            customId: !loggerSettings.customId?.trim() ? generateId() : loggerSettings.customId,
+            logFile: this.defaultLogFileNameFormater,
+            logBuilder: this.defaultLogTextFormater,
+            logToConsole: true,
+            dateFormat: StandardsDateFormatter.ISO_8601,
+            clearANSIColorInFile: true,
+            clearANSICOlorInConsole: false
+        }, ...loggerSettings};
 
         // Ensure the log folder is an absolute path
-        if (!path.isAbsolute(temp.logDir)) temp.logDir = path.resolve(temp.logDir);
+        if (!path.isAbsolute(this.settings.logDir)) this.settings.logDir = path.resolve(this.settings.logDir)
 
-        this.settings = temp;
+        // Define the logger ID
+        this.id = this.settings.customId;
 
         console.debug('ChibiLog constructor');
     }

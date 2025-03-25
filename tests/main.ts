@@ -5,12 +5,14 @@ const logger = new chibiLog({
     minimumLogLevel: 0,
     clearANSIColorInFile: true,
     clearANSICOlorInConsole: false,
-    dateFormat: StandardsDateFormatter.ISO_8601
+    dateFormatter: StandardsDateFormatter.ISO_8601
 })
 
 logger.trace('Hello, world !')
 logger.debug('Hello, world !')
-logger.info('Hello, world !', ["SUCCESS", "AUDIT", "salut"])
+logger.info('Hello, world !')
 logger.log('Hello, world !')
 logger.error('Hello, world !')
 logger.fatal('Hello, world !')
+
+logger.info("ID :", logger.id)

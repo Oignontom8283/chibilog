@@ -1,4 +1,4 @@
-import Logger, { generateId } from "src";
+import Logger, { generateId } from ".";
 
 /**
  * The `LoggersInstances` class provides a centralized management system for `Logger` instances.

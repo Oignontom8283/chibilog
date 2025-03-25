@@ -25,7 +25,7 @@ class Logger {
 
     private settings:LoggerSettings
 
-    public id:string;
+    public readonly id:string;
 
     constructor(loggerSettings:Partial<LoggerSettings>) {
 

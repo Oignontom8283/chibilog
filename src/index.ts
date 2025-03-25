@@ -2,6 +2,7 @@ import chalk from "chalk";
 import * as path from "path";
 import * as fs from "fs";
 import { StandardsDateFormatter, LogLevel, LogLevelColors, DefaultTagsType, DateFormatter, clearAnsiCode, colorizeTagString, getEnumKey, generateId } from "./utils";
+import { LoggersInstances } from "./instances";
 
 export * from "./utils";
 
@@ -16,38 +17,53 @@ type LoggerSettings = {
     clearANSIColorInFile:boolean;
     clearANSICOlorInConsole:boolean;
 }
+type InternSettings = Omit<LoggerSettings, 'customId'>
+
 
 type ParamsLogFunction = any[];
 
 type Tag = DefaultTagsType | (string & {});
 
+
+/**
+ * The `Logger` class of the **ChibiLog** library.
+ */
 class Logger {
 
-    private settings:LoggerSettings
+    private settings:InternSettings;
 
+    /**
+     * The unique identifier of the logger instance.
+     */
     public readonly id:string;
+
 
     constructor(loggerSettings:Partial<LoggerSettings>) {
 
+        const { customId, ...clearSettings } = loggerSettings;
+
+        // Generate a unique identifier for the logger instance
+        this.id = customId?.trim().toLocaleLowerCase() || LoggersInstances.createId();
+
+        // Define the settings for the logger instance
         this.settings = {...{
             logDir: './logs',
             minimumLogLevel: LogLevel.info,
-            customId: !loggerSettings.customId?.trim() ? generateId() : loggerSettings.customId,
             fileNameFormatter: this.default_fileNameFormatter,
             logFormatter: this.default_logFormatter,
             logToConsole: true,
             dateFormatter: StandardsDateFormatter.ISO_8601,
             clearANSIColorInFile: true,
             clearANSICOlorInConsole: false
-        }, ...loggerSettings};
+        }, ...clearSettings};
 
         // Ensure the log folder is an absolute path
         if (!path.isAbsolute(this.settings.logDir)) this.settings.logDir = path.resolve(this.settings.logDir)
 
-        // Define the logger ID
-        this.id = this.settings.customId;
+        // Add the logger instance to the collection
+        LoggersInstances.add(this);
 
-        console.debug('ChibiLog constructor');
+        console.debug('ChibiLog constructor'); // Debug
     }
 
     private logging(text:string, level:LogLevel, date:Date = new Date(), tags:string[] = []) {

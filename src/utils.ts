@@ -236,7 +236,7 @@ export function colorizeTagString(text: string | DefaultTagsType):string {
  * @param length - The length of the generated string id. Defaults to 5 if not provided.
  * @returns A randomly generated alphanumeric string id.
  */
-function generateId(length: number = 5): string {
+export function generateId(length: number = 5): string {
     const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
     for (let i = 0; i < length; i++) {

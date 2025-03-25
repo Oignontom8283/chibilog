@@ -33,8 +33,8 @@ class ChibiLog {
             logDir: './logs',
             minimumLogLevel: LogLevel.info,
             customId: !loggerSettings.customId?.trim() ? generateId() : loggerSettings.customId,
-            fileNameFormatter: this.defaultLogFileNameFormater,
-            logFormatter: this.defaultLogTextFormater,
+            fileNameFormatter: this.default_fileNameFormatter,
+            logFormatter: this.default_logFormatter,
             logToConsole: true,
             dateFormatter: StandardsDateFormatter.ISO_8601,
             clearANSIColorInFile: true,
@@ -92,7 +92,7 @@ class ChibiLog {
 
     // Default function to setting
 
-    private defaultLogTextFormater(time:string, level:LogLevel, content:string, tags:string[]):string {
+    private default_logFormatter(time:string, level:LogLevel, content:string, tags:string[]):string {
         const timeString = chalk.gray(time);
         const levelString = LogLevelColors[level](getEnumKey(LogLevel, level)!.toUpperCase());
         let tagsString = tags.map(tag => chalk.bold(colorizeTagString(tag.toUpperCase()))).join(", ");
@@ -101,7 +101,7 @@ class ChibiLog {
         return `[${timeString}] [${levelString}]${tagsString}: ${content}`;
     }
     
-    private defaultLogFileNameFormater(time:Date):string {
+    private default_fileNameFormatter(time:Date):string {
         const day = `${time.getDate().toString().padStart(2, '0')}-${(time.getMonth() + 1).toString().padStart(2, '0')}-${time.getFullYear()}`;
         return `log_${process.pid}_${day}.log`;
     }

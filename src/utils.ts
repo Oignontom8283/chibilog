@@ -229,3 +229,18 @@ export function colorizeTagString(text: string | DefaultTagsType):string {
     // If the text is a default tag, colorize it
     return text in DefaultTagsColors ? DefaultTagsColors[text as DefaultTagsType](text) : text;
 }
+
+/**
+ * Generates a random alphanumeric string id of the specified length.
+ *
+ * @param length - The length of the generated string id. Defaults to 5 if not provided.
+ * @returns A randomly generated alphanumeric string id.
+ */
+function generateId(length: number = 5): string {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return result;
+}

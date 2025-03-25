@@ -9,9 +9,9 @@ type LoggerSettings = {
     logDir:string;
     minimumLogLevel: LogLevel;
     customId: string;
-    logFile: (time:Date) => string;
-    logBuilder:(time:string, level:LogLevel, content:string, tags:string[]) => string;
-    dateFormat: DateFormatter;
+    fileNameFormatter: (time:Date) => string;
+    logFormatter:(time:string, level:LogLevel, content:string, tags:string[]) => string;
+    dateFormatter: DateFormatter;
     logToConsole:boolean;
     clearANSIColorInFile:boolean;
     clearANSICOlorInConsole:boolean;
@@ -33,10 +33,10 @@ class ChibiLog {
             logDir: './logs',
             minimumLogLevel: LogLevel.info,
             customId: !loggerSettings.customId?.trim() ? generateId() : loggerSettings.customId,
-            logFile: this.defaultLogFileNameFormater,
-            logBuilder: this.defaultLogTextFormater,
+            fileNameFormatter: this.defaultLogFileNameFormater,
+            logFormatter: this.defaultLogTextFormater,
             logToConsole: true,
-            dateFormat: StandardsDateFormatter.ISO_8601,
+            dateFormatter: StandardsDateFormatter.ISO_8601,
             clearANSIColorInFile: true,
             clearANSICOlorInConsole: false
         }, ...loggerSettings};
@@ -51,9 +51,9 @@ class ChibiLog {
     }
 
     private logging(text:string, level:LogLevel, date:Date = new Date(), tags:string[] = []) {
-        const time = this.settings.dateFormat(date);
-        const content = this.settings.logBuilder(time, level, text, tags);
-        const logFile = path.join(this.settings.logDir, this.settings.logFile(date));
+        const time = this.settings.dateFormatter(date);
+        const content = this.settings.logFormatter(time, level, text, tags);
+        const logFile = path.join(this.settings.logDir, this.settings.fileNameFormatter(date));
 
         const consoleContent = this.settings.clearANSICOlorInConsole ? clearAnsiCode(content) : content;
         const fileContent = this.settings.clearANSIColorInFile ? clearAnsiCode(content) : content;

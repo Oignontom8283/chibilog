@@ -2,3 +2,4 @@ node_modules/
 dist/
 tests/logs
 logs/
+tests/test.ts

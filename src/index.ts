@@ -21,7 +21,7 @@ type ParamsLogFunction = any[];
 
 type Tag = DefaultTagsType | (string & {});
 
-class ChibiLog {
+class Logger {
 
     private settings:LoggerSettings
 
@@ -141,4 +141,4 @@ class ChibiLog {
     }
 }
 
-export default ChibiLog;
+export default Logger;

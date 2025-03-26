@@ -36,7 +36,7 @@ export class LoggersInstances {
      * @param instance - The `Logger` instance to be added.
      * @throws {Error} Throws an error if the instance already exists in the collection.
      */
-    public static add(instance:Logger) {
+    public static add(instance:Logger):void {
         
         if (this.isExist(instance)) {
             throw new Error("The instance already exists")
@@ -51,7 +51,7 @@ export class LoggersInstances {
      * @param id - The unique identifier of the instance to retrieve.
      * @returns The instance with the matching identifier, or `undefined` if no match is found.
      */
-    public static get(id:string) {
+    public static get(id:string):Logger | undefined {
         return this.instances.find((i) => i.id === id)
     }
 
@@ -60,7 +60,7 @@ export class LoggersInstances {
      *
      * @returns An array containing all the instances.
      */
-    public static getAll() {
+    public static getAll():typeof LoggersInstances.instances {
         return this.instances;
     }
 
@@ -70,7 +70,7 @@ export class LoggersInstances {
      * @param id - The unique identifier of the instance to be removed.
      * @returns A boolean indicating whether an instance was removed (`true` if an instance was removed, `false` otherwise).
      */
-    public static remove(id:string) {
+    public static remove(id:string):boolean {
         const olderInstances = this.instances.length;
         this.instances = this.instances.filter((i) => i.id !== id);
 
@@ -84,7 +84,7 @@ export class LoggersInstances {
      * and returns a new `instances` object. The handler allows for custom modification
      * or replacement of the `instances`.
      */
-    public static redefine(handler:(instances:typeof LoggersInstances.instances) => typeof LoggersInstances.instances) {
+    public static redefine(handler:(instances:typeof LoggersInstances.instances) => typeof LoggersInstances.instances):void {
         this.instances = handler(this.instances);
     }
 
@@ -97,7 +97,7 @@ export class LoggersInstances {
      * 
      * @returns {string} A unique identifier.
      */
-    public static createId() {
+    public static createId():string {
         
         let id = generateId(5);
 
@@ -114,7 +114,7 @@ export class LoggersInstances {
      * @param instance - The Logger instance to check for existence.
      * @returns A boolean indicating whether the instance exists (`true`) or not (`false`).
      */
-    private static isExist(instance:Logger) {
+    private static isExist(instance:Logger):boolean {
         return this.instances.some((i) => i.id === instance.id)
     }
 }

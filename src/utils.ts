@@ -131,7 +131,9 @@ export type DateFormatter = (date:Date) => string;
  */
 export const StandardsDateFormatter= {
     /**
-     * `ISO_8601`: Formats the date as an ISO 8601 string.
+     * The [ISO 8601 standard](https://en.wikipedia.org/wiki/ISO_8601) is a standard from the 
+     * [International Organization for Standardization](https://en.wikipedia.org/wiki/International_Organization_for_Standardization) 
+     * (ISO) that specifies the numerical representation of dates and times, based on the Gregorian calendar and the 24-hour time system.
      *
      * @param {Date} date - The date object to format.
      * @returns {string} The formatted ISO 8601 string.

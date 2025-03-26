@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import * as path from "path";
 import * as fs from "fs";
-import { StandardsDateFormatter, LogLevel, LogLevelColors, DefaultTagsType, DateFormatter, clearAnsiCode, colorizeTagString, getEnumKey, generateId } from "./utils";
+import { StandardsDateFormatter, LogLevel, LogLevelColors, DefaultTagsType, DateFormatter, clearAnsiCode, colorizeTagString, getEnumKey, generateId, DefaultTags } from "./utils";
 import { LoggersInstances } from "./instances";
 
 export * from "./utils";
@@ -20,7 +20,8 @@ type LoggerSettings = {
 type InternSettings = Omit<LoggerSettings, 'customId'>
 
 
-type ParamsLogFunction = any[];
+type ParamsLogFunction = (any | { tags?: string[], sep?: string })[];
+
 
 type Tag = DefaultTagsType | (string & {});
 
@@ -88,8 +89,21 @@ class Logger {
         this.writeLineToFile(fileContent, logFile);
     }
 
-    private preLogger(text:string[], level:LogLevel, tags:string[], sep:string=' ') {
-        this.logging(text.join(sep), level, new Date(), tags);
+    private preLogger(args: ParamsLogFunction, level: LogLevel, tags: Tag[] = []) {
+        let sep: string = ' ';
+        let messages: string[];
+    
+        // Extract the log parameters from the arguments. And convert them to strings
+        const lastArg = args[args.length - 1];
+        if (typeof lastArg === "object" && lastArg !== null && ("tags" in lastArg || "sep" in lastArg)) {
+            tags = lastArg.tags || [];
+            sep = lastArg.sep || ' ';
+            messages = (args.slice(0, -1) as any[]).map(arg => `${arg}`);
+        } else {
+            messages = (args as any[]).map(arg => `${arg}`);
+        }
+    
+        this.logging(messages.join(sep), level, new Date(), tags);
     }
 
     
@@ -124,36 +138,41 @@ class Logger {
 
     //
 
-    public trace(...text:ParamsLogFunction) {
-        this.preLogger(text, LogLevel.trace, []);
+    public trace(...args:ParamsLogFunction) {
+        this.preLogger(args, LogLevel.trace, [DefaultTags.VERBOSE]);
     }
 
-    public debug(...text:ParamsLogFunction) {
-        this.preLogger(text, LogLevel.debug, []);
+    public debug(...args:ParamsLogFunction) {
+        this.preLogger(args, LogLevel.debug, [DefaultTags.DEBUG]);
     }
 
-    public info(...text:ParamsLogFunction) {
-        this.preLogger(text, LogLevel.info, []);
+    public info(...args:ParamsLogFunction) {
+        this.preLogger(args, LogLevel.info);
     }
 
-    public log(...text:ParamsLogFunction) {
-        this.preLogger(text, LogLevel.info, []);
+    public log(...args:ParamsLogFunction) {
+        this.preLogger(args, LogLevel.info); // [] is for tags
     }
 
-    public warn(...text:ParamsLogFunction) {
-        this.preLogger(text, LogLevel.warn, []);
+    public audit(...args:ParamsLogFunction) {
+        this.preLogger(args, LogLevel.info, [DefaultTags.AUDIT]);
+    }
+    
+    public warn(...args:ParamsLogFunction) {
+        this.preLogger(args, LogLevel.warn, [DefaultTags.WARN]);
     }
 
-    public error(...text:ParamsLogFunction) {
-        this.preLogger(text, LogLevel.error, []);
+    public error(...args:ParamsLogFunction) {
+        this.preLogger(args, LogLevel.error, [DefaultTags.ERROR]);
     }
 
-    public fatal(...text:ParamsLogFunction) {
-        this.preLogger(text, LogLevel.fatal, []);
+    public fatal(...args:ParamsLogFunction) {
+        this.preLogger(args, LogLevel.fatal);
     }
 
-    public logger(level:LogLevel, ...text:ParamsLogFunction) {
-        this.preLogger(text, level, []);
+
+    public logger(level:LogLevel, ...args:ParamsLogFunction) {
+        this.preLogger(args, level);
     }
 }
 

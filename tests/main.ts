@@ -11,7 +11,7 @@ const logger = new chibiLog({
 logger.trace('Hello, world !')
 logger.debug('Hello, world !')
 logger.info('Hello, world !')
-logger.log('Hello, world !')
+logger.log('Hello, world !', "slaut", "coucou", {tags: ["tag1", "tag2"], sep: " ▧ "})
 logger.error('Hello, world !')
 logger.fatal('Hello, world !')
 

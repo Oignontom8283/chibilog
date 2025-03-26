@@ -70,6 +70,11 @@ export enum DefaultTags {
     AUDIT = "AUDIT",
 
     /**
+     * The tag for a warning.
+     */
+    WARN = "WARN",
+
+    /**
      * The tag for a error.
      */
     ERROR = "ERROR",
@@ -100,7 +105,8 @@ export const DefaultTagsColors: Record<DefaultTagsType, ChalkInstance> = {
     [DefaultTags.SUCCESS]: chalk.greenBright,
     [DefaultTags.NOTICE]: chalk.blueBright,
     [DefaultTags.VERBOSE]: chalk.gray,
-    [DefaultTags.AUDIT]: chalk.yellow,
+    [DefaultTags.AUDIT]: chalk.magentaBright,
+    [DefaultTags.WARN]: chalk.yellow,
     [DefaultTags.ERROR]: chalk.redBright,
 }
 

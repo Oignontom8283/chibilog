@@ -14,5 +14,6 @@ logger.info('Hello, world !')
 logger.log('Hello, world !', "slaut", "coucou", {tags: ["tag1", "tag2"], sep: " ▧ "})
 logger.error('Hello, world !')
 logger.fatal('Hello, world !')
+logger.print('Hello, world !')
 
 logger.info("ID :", logger.id)

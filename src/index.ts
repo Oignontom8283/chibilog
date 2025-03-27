@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import * as path from "path";
 import * as fs from "fs";
-import { StandardsDateFormatter, LogLevel, LogLevelColors, DefaultTagsType, DateFormatter, clearAnsiCode, colorizeTagString, getEnumKey, generateId, DefaultTags } from "./utils";
+import { StandardsDateFormatter, LogLevel, LogLevelColors, DefaultTagsType, clearAnsiCode, colorizeTagString, getEnumKey, generateId, DefaultTags, LogArguments } from "./utils";
 import { LoggersInstances } from "./instances";
 
 export * from "./utils";
@@ -12,7 +12,7 @@ type LoggerSettings = {
     customId: string;
     fileNameFormatter: (time:Date) => string;
     logFormatter:(time:string, level:LogLevel, content:string, tags:string[]) => string;
-    dateFormatter: DateFormatter;
+    dateFormatter: (date:Date) => string;
     logToConsole:boolean;
     clearANSIColorInFile:boolean;
     clearANSICOlorInConsole:boolean;
@@ -67,12 +67,17 @@ class Logger {
         console.debug('ChibiLog constructor'); // Debug
     }
 
-    private logging(text:string, level:LogLevel, date:Date = new Date(), tags:string[] = []) {
-        const time = this.settings.dateFormatter(date);
-        const content = this.settings.logFormatter(time, level, text, tags);
-        const logFile = path.join(this.settings.logDir, this.settings.fileNameFormatter(date));
+    private logging(args:LogArguments) {
+        const { message, params, time, level, print } = args;
 
-        const consoleContent = this.settings.clearANSICOlorInConsole ? clearAnsiCode(content) : content;
+        const date = this.settings.dateFormatter(time);
+        const content = this.settings.logFormatter(date, level, message, params.tags);
+        const filePath = path.join(this.settings.logDir, this.settings.fileNameFormatter(time));
+
+
+        let consoleContent = !print ? content : message;
+        consoleContent = this.settings.clearANSICOlorInConsole ? clearAnsiCode(consoleContent) : consoleContent;
+
         const fileContent = this.settings.clearANSIColorInFile ? clearAnsiCode(content) : content;
 
         // Log to the console
@@ -86,24 +91,34 @@ class Logger {
         }
 
         // Log to the file
-        this.writeLineToFile(fileContent, logFile);
+        this.writeLineToFile(fileContent, filePath);
     }
 
-    private preLogger(args: ParamsLogFunction, level: LogLevel, tags: Tag[] = []) {
+    private argsExtractor(args: ParamsLogFunction, tags:string[] = []):{ message:string, params: {tags: string[], sep: string} } {
         let sep: string = ' ';
-        let messages: string[];
+        let message: string[];
     
         // Extract the log parameters from the arguments. And convert them to strings
         const lastArg = args[args.length - 1];
         if (typeof lastArg === "object" && lastArg !== null && ("tags" in lastArg || "sep" in lastArg)) {
             tags = lastArg.tags || [];
             sep = lastArg.sep || ' ';
-            messages = (args.slice(0, -1) as any[]).map(arg => `${arg}`);
+            message = (args.slice(0, -1) as any[]).map(arg => `${arg}`);
         } else {
-            messages = (args as any[]).map(arg => `${arg}`);
+            message = (args as any[]).map(arg => `${arg}`);
         }
+        
+        return { message: message.join(sep), params: { tags, sep} }
+    }
+
+    private preLogger(args: ParamsLogFunction, level: LogLevel, tags: Tag[] = [], print:boolean=false):void {
     
-        this.logging(messages.join(sep), level, new Date(), tags);
+        this.logging({
+            ...this.argsExtractor(args, tags),
+            time: new Date(),
+            level,
+            print
+        });
     }
 
     
@@ -126,9 +141,9 @@ class Logger {
         const timeString = chalk.gray(time);
         const levelString = LogLevelColors[level](getEnumKey(LogLevel, level)!.toUpperCase());
         let tagsString = tags.map(tag => chalk.bold(colorizeTagString(tag.toUpperCase()))).join(", ");
-        if (tagsString !== "") tagsString = ` <${tagsString}>`;
+        if (tagsString !== "") tagsString = ` (${tagsString})`;
     
-        return `[${timeString}] [${levelString}]${tagsString}: ${content}`;
+        return `[${timeString}] [${levelString}]${tagsString} ${content}`;
     }
     
     private default_fileNameFormatter(time:Date):string {
@@ -151,13 +166,13 @@ class Logger {
     }
 
     public log(...args:ParamsLogFunction) {
-        this.preLogger(args, LogLevel.info); // [] is for tags
+        this.preLogger(args, LogLevel.info);
     }
 
     public audit(...args:ParamsLogFunction) {
         this.preLogger(args, LogLevel.info, [DefaultTags.AUDIT]);
     }
-    
+
     public warn(...args:ParamsLogFunction) {
         this.preLogger(args, LogLevel.warn, [DefaultTags.WARN]);
     }
@@ -170,6 +185,9 @@ class Logger {
         this.preLogger(args, LogLevel.fatal);
     }
 
+    public print(...args:ParamsLogFunction) {
+        this.preLogger(args, LogLevel.info, [DefaultTags.PRINT], true);
+    }
 
     public logger(level:LogLevel, ...args:ParamsLogFunction) {
         this.preLogger(args, level);

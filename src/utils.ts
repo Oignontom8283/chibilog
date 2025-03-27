@@ -65,6 +65,11 @@ export enum DefaultTags {
     VERBOSE = "VERBOSE",
 
     /**
+     * The tag for a print message.
+     */
+    PRINT = "PRINT",
+
+    /**
      * The tag for a user action.
      */
     AUDIT = "AUDIT",
@@ -112,18 +117,18 @@ export const DefaultTagsColors: Record<DefaultTagsType, ChalkInstance> = {
     [DefaultTags.VERBOSE]: chalk.gray,
     [DefaultTags.AUDIT]: chalk.magentaBright,
     [DefaultTags.DEBUG]: chalk.cyanBright,
+    [DefaultTags.PRINT]: chalk.white,
     [DefaultTags.WARN]: chalk.yellow,
     [DefaultTags.ERROR]: chalk.redBright,
 }
 
-
-/**
- * Function type to format dates in Logs.
- *
- * @param date - The `Date` object to be formatted.
- * @returns A string representation of the formatted date.
- */
-export type DateFormatter = (date:Date) => string;
+export type LogArguments = {
+    message: string;
+    params: {tags: string[], sep: string};
+    time: Date;
+    level: LogLevel;
+    print: boolean;
+}
 
 /**
  * A collection of date formatting functions.

@@ -147,7 +147,7 @@ class Logger {
     }
     
     private default_fileNameFormatter(time:Date):string {
-        const day = `${time.getDate().toString().padStart(2, '0')}-${(time.getMonth() + 1).toString().padStart(2, '0')}-${time.getFullYear()}`;
+        const day = `${time.toISOString().split('T')[0]}`;
         return `log_${process.pid}_${day}.log`;
     }
 

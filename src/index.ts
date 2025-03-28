@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import * as path from "path";
 import * as fs from "fs";
-import { StandardsDateFormatter, LogLevel, LogLevelColors, DefaultTagsType, clearAnsiCode, colorizeTagString, getEnumKey, generateId, DefaultTags, LogArguments } from "./utils";
+import { StandardsDateFormatter, LogLevel, LogLevelColors, DefaultTagsType, clearAnsiCode, colorizeTagString, getEnumKey, generateId, DefaultTags, LogArguments, colorizeJson } from "./utils";
 import { LoggersInstances } from "./instances";
 
 export * from "./utils";
@@ -187,6 +187,19 @@ class Logger {
 
     public print(...args:ParamsLogFunction) {
         this.preLogger(args, LogLevel.info, [DefaultTags.PRINT], true);
+    }
+
+    public json(data:any, tags:Tag[] = [], space: number = 2, print:boolean = false) {
+
+        if (typeof data !== "string") data = JSON.stringify(data, null, space);
+        
+        this.logging({
+            message: colorizeJson(data),
+            params: { tags, sep: ' ' },
+            time: new Date(),
+            level: LogLevel.info,
+            print: print
+        })
     }
 
     public logger(level:LogLevel, ...args:ParamsLogFunction) {

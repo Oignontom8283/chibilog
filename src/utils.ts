@@ -263,3 +263,31 @@ export function generateId(length: number = 5): string {
     }
     return result;
 }
+
+/**
+ * Enhances a JSON string with syntax highlighting for better readability in the terminal.
+ * 
+ * The function applies different colors to JSON keys, strings, numbers, booleans, and null values
+ * using the `chalk` library.
+ * 
+ * @param jsonString - The JSON string to be colorized.
+ * @returns A colorized version of the input JSON string.
+ * 
+ * @example
+ * ```typescript
+ * import chalk from 'chalk';
+ * 
+ * const json = '{"name": "John", "age": 30, "isAdmin": false, "address": null}';
+ * console.log(colorizeJson(json));
+ * ```
+ */
+export function colorizeJson(jsonString: string): string {
+    return jsonString.replace(/("(\\\\|\\"|[^"])*"(?=\s*:))|("(\\\\|\\"|[^"])*")|(\b\d+\.?\d*\b)|(true|false)|(null)/g, (match, key, _, str, __, num, bool, nullValue) => {
+        if (key) return chalk.yellow(key);
+        if (str) return chalk.green(str);
+        if (num) return chalk.cyan(num);
+        if (bool) return chalk.magenta(bool);
+        if (nullValue) return chalk.red(nullValue);
+        return match;
+    });
+}
